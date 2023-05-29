@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mastermind Game</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        td {
+            width: 20px;
+            height: 20px;
+        }
+
+        .color-circle {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Mastermind Game</h1>
+{% if mensaje %}
+    <p>{{ mensaje }}</p>
+{% else %}
+    <h2>Guess the Secret Combination</h2>
+    <form method="POST" action="/">
+        <table>
+            <tr>
+                <th>Attempt</th>
+                <th>Colors</th>
+                <th>Result</th>
+            </tr>
+            {% for intento in intentos %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        {% for color in intento.intento %}
+                            <div class="color-circle" style="background-color: {{ color }}"></div>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for acierto in intento.resultado.aciertos %}
+                            {% if acierto %}
+                                <div class="color-circle" style="background-color: black"></div>
+                            {% elif not acierto %}
+                                <div class="color-circle" style="background-color: white"></div>
+                            {% endif %}
+                        {% endfor %}
+                        ({{ intento.resultado.muertos }}, {{ intento.resultado.heridos }})
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <br>
+        {% if intentos|length % 2 == 0 and intentos|length < 10 and intentos %}
+    <h3>Machine Guess</h3>
+    <table>
+        <tr>
+            <th>Colors</th>
+            <th>Result</th>
+        </tr>
+        <tr>
+            <td>
+                {% for color in intentos[-1].intento %}
+                    <div class="color-circle" style="background-color: {{ color }}"></div>
+                {% endfor %}
+            </td>
+            <td>
+                {% for acierto in intentos[-1].resultado.aciertos %}
+                    {% if acierto  %}
+                        <div class="color-circle" style="background-color: black"></div>
+                    {% elif not acierto %}
+                        <div class="color-circle" style="background-color: white"></div>
+                    {% endif %}
+                {% endfor %}
+                ({{ intentos[-1].resultado.muertos }}, {{ intentos[-1].resultado.heridos }})
+            </td>
+        </tr>
+    </table>
+{% endif %}
+        <br>
+        <h3>Your Guess</h3>
+        <table>
+            <tr>
+                {% for _ in range(4) %}
+                    <td>
+                        <select name="intento[{{ loop.index }}]">
+                            {% for color, hex_code in colores.items() %}
+                                <option value="{{ hex_code }}">{{ color }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                {% endfor %}
+            </tr>
+        </table>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+{% endif %}
+<br>
+<form method="POST" action="/reiniciar">
+    <input type="submit" value="Restart Game">
+</form>
+</body>
+</html>
